@@ -1,6 +1,6 @@
 ﻿{
   "name": "Sync Address and Scroll",
-  "version": "0.2",
+  "version": "0.1",
   "update_url": "https://raw.github.com/alantreadway/sync-scroll-chrome-extension/master/updates.xml",
   "manifest_version": 2,
   "description": "Syncronize active tabs' address and scroll bar.",
