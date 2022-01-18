@@ -22,8 +22,9 @@
   "content_scripts": [
   {
     "matches": [
-      "http://*/*",
-      "https://*/*"
+      "https://ag-grid.com/*",
+      "https://*.ag-grid.com/*",
+      "https://localhost:8000/*"
     ],
     "js": ["scroll.js"]
   }
