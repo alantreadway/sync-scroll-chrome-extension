@@ -1,5 +1,6 @@
 ﻿sync_scroll = {
-    on: true,
+    on: false,
+	debug: true,
     setOn: function (on) {
         sync_scroll.on = on;
         if(sync_scroll.isOn()) {
@@ -17,9 +18,7 @@
     },
     toggle: function () {
         sync_scroll.setOn(!sync_scroll.isOn());
-    },
-    current_id: null,
-    current_index: null
+    }
 }
 
 chrome.browserAction.onClicked.addListener(function (){
@@ -30,7 +29,19 @@ var selectedTabs = {};
 
 chrome.tabs.onHighlighted.addListener(function (highlightedInfo) {
 	selectedTabs[highlightedInfo.windowId] = highlightedInfo.tabIds;
-	console.log('highlighted on windowId:' + highlightedInfo.windowId + ' tabIds:' + highlightedInfo.tabIds.join(','));
+	log(`highlighted on windowId: ${highlightedInfo.windowId} tabIds: ${highlightedInfo.tabIds.join(',')}`);
+});
+
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+	if (!tab.highlighted) { return; }
+	selectedTabs[tab.windowId] = tab.id;
+
+	if (!sync_scroll.isOn()) { return; }
+
+	var port = ports[tabId];
+	if (port == null) { return; }
+
+	sendToSelectedTabs(port, { url: changeInfo.url });
 });
 
 var ports = {};
@@ -39,15 +50,17 @@ chrome.extension.onConnect.addListener(function (port) {
 	console.assert(port.name === 'sync_scroll');
 	var tab_id = port.sender.tab.id;
 	ports[tab_id] = port;
-	console.log('port is connected from tabId:' + tab_id);
+	log(`port is connected from tabId: ${tab_id}`);
 	port.onMessage.addListener(function emit(msg) {
-		if (!sync_scroll.isOn()) {
-			return;
-		}
+		if (!sync_scroll.isOn()) { return; }
 		if (msg.window_scrollY) {
 			var x = msg.window_scrollX;
 			var y = msg.window_scrollY;
-			console.log('background receives scrollXY:' + x + ',' + y);
+			log(`background receives scrollXY: ${x}, ${y}`);
+			sendToSelectedTabs(port, msg);
+		}
+		if (msg.url) {
+			log(`background receives url: ${url}`);
 			sendToSelectedTabs(port, msg);
 		}
 	});
@@ -65,15 +78,19 @@ function selectedTabIds() {
 }
 
 function sendToSelectedTabs(port, msg) {
-	var tabIds = selectedTabIds(),
-		i;
-	for (i = 0; i < tabIds.length; i++) {
-		var tab_id = tabIds[i];
+	var tabIds = selectedTabIds();
+	for (var tab_id of tabIds) {
 		if (ports[tab_id] && ports[tab_id] !== port) {
 			ports[tab_id].postMessage(msg);
-			console.log('background sends ' + msg.window_scrollX + ',' + msg.window_scrollY + ' to tabId:' + tab_id);
+			log(`background sends ${msg.window_scrollX},${msg.window_scrollY} to tabId: ${tab_id}`);
 		}
 	}
 }
 
 sync_scroll.setOn(true);
+
+function log(msg) {
+	if (sync_scroll.debug) {
+		console.log(`[sync_scroll]: ${msg}`);
+	}
+}

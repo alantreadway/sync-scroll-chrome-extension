@@ -1,14 +1,14 @@
 ﻿{
-  "name": "Sync Scroll",
+  "name": "Sync Address and Scroll",
   "version": "0.2",
-  "update_url": "https://raw.github.com/takatama/sync-scroll-chrome-extension/master/updates.xml",
+  "update_url": "https://raw.github.com/alantreadway/sync-scroll-chrome-extension/master/updates.xml",
   "manifest_version": 2,
-  "description": "Syncronize active tabs' scroll bar.",
+  "description": "Syncronize active tabs' address and scroll bar.",
   "icons": { "16": "icon16.png",
              "48": "icon48.png",
              "128": "icon128.png" },
   "browser_action": {
-      "name": "Sync Scroll",
+      "name": "Sync Address and Scroll",
       "default_icon": "icon16.png"
   },
   "background": {
