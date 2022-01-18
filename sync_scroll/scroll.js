@@ -1,7 +1,7 @@
 ﻿sync_scroll = {
 	port: chrome.extension.connect({name: "sync_scroll"}),
 	focused: false,
-	debug: true,
+	debug: false,
 }
 
 window.addEventListener('scroll', function (e) {

@@ -1,6 +1,6 @@
 ﻿sync_scroll = {
     on: false,
-	debug: true,
+	debug: false,
     setOn: function (on) {
         sync_scroll.on = on;
         if(sync_scroll.isOn()) {
